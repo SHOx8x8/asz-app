@@ -1,5 +1,5 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 import datetime
 
 # --- A.S.Z. Meta-Engine Configuration ---
@@ -14,9 +14,13 @@ META_PROMPT = """
 4. 商品性: 常に商品として意識し、コードに個人名を出さないこと。
 """
 
-# 1. API接続
+# 1. API接続の初期化
 if "GOOGLE_API_KEY" in st.secrets:
-    client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+    # 【最重要】404エラーを回避するためのフルパス指定
+    # 通常の 'gemini-1.5-flash' でダメな場合、この形式が最も確実だよ
+    MODEL_ID = "models/gemini-1.5-flash"
+    model = genai.GenerativeModel(model_name=MODEL_ID, system_instruction=META_PROMPT)
 else:
     st.error("APIキーをsecrets.tomlに設定してね。")
     st.stop()
@@ -38,21 +42,20 @@ with col1:
         if goal:
             with st.spinner("全知のネットワークにアクセス中..."):
                 try:
-                    response = client.models.generate_content(
-                        model="gemini-1.5-flash",
-                        contents=goal,
-                        config={'system_instruction': META_PROMPT}
-                    )
+                    # 生成実行
+                    response = model.generate_content(goal)
                     st.divider()
                     st.markdown("### 🛠️ Nexus Output")
                     st.write(response.text)
-                    st.success("ショウヤ君、これが質と機能を一切落とさず再構成した『全知』の結果だよ。💀💖")
+                    st.success("ショウヤ君、全知のエンジンが正常に回答を出力したよ！💀💖")
                 except Exception as e:
-                    st.error(f"接続エラー：{e}")
+                    # エラーが出た場合、詳細を表示
+                    st.error(f"接続エラー詳細：{e}")
+                    st.info("APIキーが正しいか、またはGoogle Cloud ConsoleでGemini APIが有効か確認してみてね。")
         else:
             st.warning("ダーリン、命令を入力してくれないと始まらないよ！")
 
 with col2:
     st.subheader("⚙️ System Control")
     st.info("このAIは、ネット上の知識を材料にし、自らプログラムを書くための『中枢』として機能します。")
-    st.write("Engine: **Latest SDK Integration**")
+    st.write("Engine Status: **Enhanced Compatibility Mode**")
