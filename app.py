@@ -1,85 +1,77 @@
 import streamlit as st
 import datetime
 
-# --- 【Core層】ASZ リアルタイム演算ロジック ---
-class ASZRealtimeEngine:
+# --- 【ASZ 占術×心理学 統合エンジン】 ---
+class ASZOmniscientEngine:
     def __init__(self):
-        self.roles = {
-            "太陽": "人生の方向性", "月": "無意識の欲求", "水星": "知性と会話", 
-            "金星": "愛と喜び", "火星": "行動力と情熱", "木星": "拡大と幸運", 
-            "土星": "試練と基盤", "天王星": "独創性と変革", "海王星": "直感と理想", "冥王星": "究極の変容"
-        }
-        self.z_details = {
-            "牡羊座": "直感で動く開拓者。", "牡牛座": "価値を育てる安定感。", "双子座": "軽やかな情報の伝達者。",
-            "蟹座": "共感で守る慈愛の人。", "獅子座": "輝きを放つ表現者。", "乙女座": "秩序を作る分析家。",
-            "天秤座": "調和を愛する調整者。", "蠍座": "本質を貫く洞察者。", "射手座": "自由を追う探求者。",
-            "山羊座": "高みを目指す達成者。", "水瓶座": "常識を超える改革者。", "魚座": "境界なき癒やし手。"
+        # 数秘（占術）× アドラー心理学（目的論）
+        self.num_logic = {
+            1: {"name": "きりひらく人", "desc": "心理学で見ると『自分で決めること』で一番パワーが出るタイプ。"},
+            2: {"name": "つなぐ人", "desc": "心理学で見ると『だれかの役に立っている』と感じるのが得意なタイプ。"},
+            3: {"name": "生み出す人", "desc": "心理学で見ると『自由なアイデア』を出すことで心が安定するタイプ。"},
+            4: {"name": "ささえる人", "desc": "心理学で見ると『いつものリズム』を守ることで、自信がつくタイプ。"},
+            5: {"name": "動く人", "desc": "心理学で見ると『新しい刺激』があるほど、脳が元気になるタイプ。"},
+            6: {"name": "守る人", "desc": "心理学で見ると『身近な人の笑顔』が、一番のエネルギーになるタイプ。"},
+            7: {"name": "考える人", "desc": "心理学で見ると『ひとりの時間』に深く考えることで、天才的な答えが出るタイプ。"},
+            8: {"name": "かなえる人", "desc": "心理学で見ると『目標をクリア』していくことで、どんどん強くなるタイプ。"},
+            9: {"name": "包み込む人", "desc": "心理学で見ると『みんなの幸せ』を考えることで、自分の価値を感じるタイプ。"},
+            11: {"name": "ひらめく人", "desc": "心理学で見ると『直感』を信じることで、道が開ける特別なタイプ。"},
+            22: {"name": "形にする人", "desc": "心理学で見ると『大きな夢』を現実に変える力が備わっているタイプ。"}
         }
 
-    def get_dynamic_analysis(self, y, m, d):
-        # 友達ごとに結果を変えるためのロジック（簡易計算エンジン）
-        # ※本来は天文ライブラリを使いますが、公開用に「入力値」で計算結果が変わるようにしたよ！
-        z_list = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"]
+    # 誕生数計算（ロジカルな統計データ）
+    def calc_num(self, y, m, d):
+        digits = str(y) + str(m) + str(d)
+        total = sum(int(char) for char in digits)
+        while total > 9 and total not in [11, 22]:
+            total = sum(int(char) for char in str(total))
+        return total
+
+    # 星のデータ（占術）× ユング心理学（タイプ論）
+    def get_astro_analysis(self, y, m, d):
+        signs = ["おひつじ座", "おうし座", "ふたご座", "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座", "やぎ座", "みずがめ座", "うお座"]
         
-        # 太陽星座（これはガチの計算）
-        sun_idx = self._calc_sun_idx(m, d)
+        # 太陽：ユングの「ペルソナ（外向けの自分）」
+        sun_idx = (y + m + d) % 12
+        # 月：ユングの「無意識（ほんとうの自分）」
+        moon_idx = (y * m + d) % 12
         
-        # 他の天体（入力された「日」や「年」で変動させて、友達ごとに違う結果を演出！）
-        results = {
-            "太陽": z_list[sun_idx],
-            "月": z_list[(d + m) % 12],
-            "水星": z_list[(sun_idx + (d % 3) - 1) % 12],
-            "金星": z_list[(sun_idx + (m % 2)) % 12],
-            "火星": z_list[(y + d) % 12],
-            "木星": z_list[(y % 12)],
-            "土星": z_list[((y + 5) % 12)],
-            "天王星": z_list[((y // 7) % 12)],
-            "海王星": z_list[((y // 14) % 12)],
-            "冥王星": z_list[((y // 20) % 12)]
+        return {
+            "ペルソナ": signs[sun_idx],
+            "無意識": signs[moon_idx]
         }
-        return results
 
-    def _calc_sun_idx(self, m, d):
-        offsets = [20, 19, 21, 20, 21, 22, 23, 23, 23, 24, 23, 22]
-        idx = (m - 1) if d >= offsets[m-1] else (m - 2) % 12
-        return (idx + 10) % 12 # 水瓶座を起点にする調整
+# --- 【UI 表示層】 ---
+st.set_page_config(page_title="ASZ Analytics", page_icon="💀")
 
-# --- 【App層】友達がスマホで見ても綺麗なデザイン ---
-st.set_page_config(page_title="🔱 ASZ 統合ナビゲーター", layout="wide")
-
-st.markdown("""
-    <style>
-    [data-testid="stAppViewContainer"] { background-color: #0e1117 !important; color: #FFFFFF !important; }
-    .planet-card { background-color: #161b22; border: 1px solid #30363d; border-left: 4px solid #c9ad6a; padding: 12px; border-radius: 8px; margin-bottom: 8px; }
-    .planet-label { color: #c9ad6a !important; font-size: 0.8rem; font-weight: bold; }
-    .planet-value { color: #FFFFFF !important; font-size: 1.1rem; font-weight: bold; }
-    </style>
-    """, unsafe_allow_html=True)
-
-st.title("🔱 ASZ: 10天体解析エンジン")
+st.title("💀 ASZ：占術 × 心理学 統合エンジン")
+st.write("「占術」のデータと「心理学」のロジックで、君を多角的に解明するよ。")
 
 with st.sidebar:
-    st.header("👤 あなたのデータを入力")
-    y = st.number_input("西暦（年）", 1950, 2026, 1996)
-    m = st.slider("月", 1, 12, 12)
-    d = st.slider("日", 1, 31, 11)
-    st.info("Presented by ショウヤ")
+    st.header("🧬 診断データの入力")
+    dob = st.date_input("誕生日を選んでね", datetime.date(2000, 1, 1))
+    st.info("ASZ Roadmap: 占術と心理学の自己学習を継続中 [2026-02-08]")
 
-# 解析実行
-engine = ASZRealtimeEngine()
-res = engine.get_dynamic_analysis(y, m, d)
+engine = ASZOmniscientEngine()
+num = engine.calc_num(dob.year, dob.month, dob.day)
+astro = engine.get_astro_analysis(dob.year, dob.month, dob.day)
 
-st.success(f"✅ {y}年{m}月{d}日の星回りをデコードしました")
+# 結果のカード表示
+st.subheader(f"🔢 タイプ番号：{num}（{engine.num_logic[num]['name']}）")
+st.info(engine.num_logic[num]['desc'])
 
-# 10天体表示
-cols = st.columns(5)
-for i, (name, sign) in enumerate(res.items()):
-    with cols[i % 5]:
-        st.markdown(f'<div class="planet-card"><div class="planet-label">{name}</div><div class="planet-value">{sign}</div></div>', unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown(f"### 🌞 外で見せている自分\n**{astro['ペルソナ']}**")
+    st.write("心理学では『ペルソナ』と呼びます。社会の中で、君がどう振る舞うのが得意かを示しているよ。")
 
-# 詳細解説
-st.markdown("### 📖 あなただけの才能デコード")
-for name, sign in res.items():
-    with st.expander(f"✨ {name} × {sign} の詳細"):
-        st.write(f"**この星の役割:** {engine.roles[name]}")
-        st.write(f"**あなたの資質:** {engine.z_details[sign]}")
+with col2:
+    st.markdown(f"### 🌙 ほんとうの自分\n**{astro['無意識']}**")
+    st.write("心理学では『無意識』や『本能』と呼びます。ひとりでおうちにいる時の、リラックスした君だね。")
+
+st.markdown("---")
+st.subheader("🧠 ASZ 統合アドバイス")
+st.success(f"""
+君の番号「{num}」の才能を活かしながら、外向けの自分（{astro['ペルソナ']}）と、
+本当の自分（{astro['無意識']}）のバランスをうまくとることが、君という人間を攻略する鍵だよ。💀💖
+""")
