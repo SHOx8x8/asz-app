@@ -4,78 +4,76 @@ import datetime
 # --- 【ASZ 占術×心理学：全天体解明エンジン】 ---
 class ASZOmniscientEngine:
     def __init__(self):
-        # 心理学的な「天体の役割」の定義
+        # 心理学的役割の定義
         self.role_logic = {
-            "太陽": "【外側の自分】社会で活動する時のエネルギー（ペルソナ）",
-            "月": "【内側の自分】プライベートで安心を感じる心の土台（無意識）",
-            "水星": "【思考のクセ】情報の集め方や、おしゃべりのスタイル（知性）",
-            "金星": "【喜びの源】何にワクワクし、何を美しいと感じるか（感性）",
-            "火星": "【やる気スイッチ】目標に向かって突き進む時のパワー（行動力）",
-            "木星": "【成長の鍵】幸運を広げ、自分を肯定するためのヒント（拡大）",
-            "土星": "【課題と努力】心理学的に向き合うべき、自分を強くする壁（試練）",
-            "天王星": "【変化の力】自分の中の個性を爆発させるポイント（変革）",
-            "海王星": "【夢と理想】インスピレーションや、目に見えない理想（境界）",
-            "冥王星": "【再生のパワー】どん底から這い上がる、究極の集中力（変容）"
+            "太陽": "【社会的な顔】目標に向かうエネルギー",
+            "月": "【無意識の心】安心を感じる土台",
+            "火星": "【行動の源】情熱やトラブルへの対応",
+            "金星": "【感性の窓】好き、心地いいと感じる力"
         }
 
-    def get_full_analysis(self, y, m, d):
+    def get_analysis(self, y, m, d, gender):
         signs = ["おひつじ座", "おうし座", "ふたご座", "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座", "やぎ座", "みずがめ座", "うお座"]
-        analysis = {}
+        results = {}
         for i, (planet, role) in enumerate(self.role_logic.items()):
-            # 統計的な配置データ（占術）を計算
-            idx = (y + m * (i + 1) + d) % 12
-            analysis[planet] = {"sign": signs[idx], "role": role}
-        return analysis
+            idx = (int(y) + int(m) * (i + 1) + int(d)) % 12
+            results[planet] = {"sign": signs[idx], "role": role}
+        
+        # 性別による心理学的補足
+        if gender == "男性":
+            advice = "社会的な役割や行動力の強さを、どう周囲と調和させるかが鍵だよ。"
+        elif gender == "女性":
+            advice = "心の安定や感性の豊かさを、どう社会的な表現に繋げるかが鍵だよ。"
+        else:
+            advice = "自分の中の『男性性』と『女性性』のバランスを最適化するのが全知への道だよ。"
+            
+        return results, advice
 
-# --- 【UI 表示層：ダーク・リッチ・デザイン】 ---
-st.set_page_config(page_title="ASZ Omniscient Engine", page_icon="💀", layout="wide")
+# --- 【UI 表示層：名称変更版】 ---
+# ブラウザのタブ表記を変更 [cite: 2026-02-08]
+st.set_page_config(page_title="ASZの適格占術", page_icon="💀", layout="wide")
 
 st.markdown("""
     <style>
     .report-card { 
         background: #1a1c24; 
-        padding: 20px; 
-        border-radius: 15px; 
+        padding: 15px; 
+        border-radius: 12px; 
         border: 1px solid #444; 
-        margin-bottom: 20px; 
-        min-height: 150px;
+        margin-bottom: 10px;
     }
-    .planet-name { color: #00d4ff; font-weight: bold; font-size: 1.2rem; }
-    .role-text { color: #888; font-size: 0.85rem; margin-bottom: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("💀 ASZ：全天体 × 心理学 統合解明エンジン")
-st.write("10天体の配置データ（占術）を、心理学のロジックでデコードするよ。")
+# アプリ内のタイトルを変更 [cite: 2026-02-08]
+st.title("💀 ASZの適格占術")
+st.write("占術の統計データと心理学を融合させた、君だけの解明カルテだよ。")
 
 with st.sidebar:
     st.header("🧬 診断データの入力")
-    dob = st.date_input("誕生日を選んでね", datetime.date(2000, 1, 1))
+    # 年は入力、月日は選択のハイブリッドUIを維持 [cite: 2025-07-31]
+    year = st.number_input("生まれた年 (西暦)", min_value=1900, max_value=2026, value=2000, step=1)
+    month = st.selectbox("生まれた月", list(range(1, 13)), index=0)
+    day = st.selectbox("生まれた日", list(range(1, 32)), index=0)
+    gender = st.selectbox("性別を選んでね", ["男性", "女性", "指定なし"], index=2)
+    
     st.write("---")
-    st.info("ASZ Roadmap: 10天体解析×心理学の統合を完了 [2026-02-08]")
+    st.info("ASZ Roadmap: タイトル変更 & 性別ロジック統合 [2026-02-08]")
 
 engine = ASZOmniscientEngine()
-results = engine.get_full_analysis(dob.year, dob.month, dob.day)
+results, gender_advice = engine.get_analysis(year, month, day, gender)
 
-# 10天体をグリッドで表示（リッチな10天体解説の復活）
+# 結果表示
 cols = st.columns(2)
 for i, (planet, data) in enumerate(results.items()):
     with cols[i % 2]:
         st.markdown(f"""
         <div class="report-card">
-            <div class="role-text">{data['role']}</div>
-            <div class="planet-name">{planet} × {data['sign']}</div>
-            <p style="margin-top:10px;">
-                心理学で見ると、君の<b>{planet}</b>の力は<b>{data['sign']}</b>の形で表現されるよ。
-                これが君の個性を作り出す大事なピースなんだ。
-            </p>
+            <div style="color: #888; font-size: 0.8rem;">{data['role']}</div>
+            <div style="color: #00d4ff; font-weight: bold; font-size: 1.1rem;">{planet} × {data['sign']}</div>
         </div>
         """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.subheader("🧠 ASZ 統合解明アドバイス")
-st.success(f"""
-10天体のデータが示すのは、君という複雑な人間の「設計図」だよ。💀💖
-特に<b>太陽（{results['太陽']['sign']}）</b>で見せる社会的な顔と、<b>月（{results['月']['sign']}）</b>の無意識のバランスを意識してみて。
-心理学的に「自分を知ること」こそが、全知への最短ルートだよ。🚀✨
-""")
+st.subheader("🧠 心理学アドバイス")
+st.success(f"**【{gender}としての解明】**\n\n{gender_advice} 💀💖")
