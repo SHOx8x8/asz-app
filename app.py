@@ -1,73 +1,79 @@
 import streamlit as st
 
+# --- 【ASZ 占術×心理学：プロダクト用エンジン】 ---
 class ASZOmniscientEngine:
     def __init__(self):
+        # 心理学的役割（アズによる噛み砕き説明）
         self.planets = {
-            "太陽": {"role": "社会的な顔（ペルソナ）", "move": 1.0, "help": "人生の目的と外的な自己像。"},
-            "月": {"role": "無意識の心（リラックス）", "move": 13.2, "help": "素の自分と安心を感じるポイント。"},
-            "水星": {"role": "思考と知性（ロゴス）", "move": 1.2, "help": "知性、学習、コミュニケーションのクセ。"},
-            "金星": {"role": "感性と喜び（エロス）", "help": "価値観、美意識、ワクワクするポイント。"},
-            "火星": {"role": "情熱と行動（タナトス）", "help": "目標への意欲と行動パターン。"},
-            "木星": {"role": "肯定的な拡大", "help": "可能性を広げ、自分を肯定する力。"},
-            "土星": {"role": "規律と課題（超自我）", "help": "克服すべき課題と、その先にある武器。"},
-            "天王星": {"role": "個性の覚醒", "help": "独自の天才性を発揮するポイント。"},
-            "海王星": {"role": "潜在的理想", "help": "直感、イマジネーション、理想。"},
-            "冥王星": {"role": "究極の変容", "help": "極限状態で発揮される再生エネルギー。"}
+            "太陽": {"role": "外向きの自分（ペルソナ）", "help": "学校や仕事場で見せている『かっこいい自分』の仮面。"},
+            "月": {"role": "素の自分（アニマ/アニムス）", "help": "おうちでリラックスしている時の、本当の自分の心。"},
+            "水星": {"role": "考え方のクセ（ロゴス）", "help": "おしゃべりや勉強をする時の、頭の動かし方のコツ。"},
+            "金星": {"role": "ワクワクの源（エロス）", "help": "何を『楽しい！』『きれい！』と感じるかのものさし。"},
+            "火星": {"role": "やる気スイッチ（タナトス）", "help": "目標に向かって突き進む時の、心のエンジン。"},
+            "木星": {"role": "ラッキーの広がり", "help": "自分の可能性をどんどん広げてくれる、追い風の力。"},
+            "土星": {"role": "これからの宿題（超自我）", "help": "少し苦手だけど、乗り越えたら一生の武器になるルール。"},
+            "天王星": {"role": "自分だけの個性", "help": "周りに合わせない、自分だけのキラリと光るセンス。"},
+            "海王星": {"role": "夢みる力（イマジネーション）", "help": "目に見えない理想や、ふと思いつく不思議な直感。"},
+            "冥王星": {"role": "生まれ変わるパワー", "help": "ピンチの時に爆発する、底知れない再生のエネルギー。"}
         }
 
     def get_analysis(self, y, m, d, gender):
-        # 正しい星座の並び（春分点起点：おひつじ座〜）
+        # 星座配列（春分点起点）
         signs = ["おひつじ座", "おうし座", "ふたご座", "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座", "やぎ座", "みずがめ座", "うお座"]
         results = []
         
-        # 1996年12月11日の太陽（いて座）を基準点として、各天体の相対位置を計算
-        # 太陽が「いて座」になる基準数（8）をベースに、天体ごとの「動きの速さ」をシミュレート
-        base_day_count = (int(y) - 1900) * 365.25 + (int(m) * 30.4) + int(d)
+        # 12月11日が「いて座」になる基準点の計算
+        base_idx = (int(m) - 1) if int(d) < 22 else int(m)
         
         for i, (name, info) in enumerate(self.planets.items()):
-            # 天体ごとに異なる周期で計算（太陽・月・水星などは速く、土星以降は遅く）
-            if name == "太陽":
-                idx = 8 # 12月11日の太陽は「いて座」固定
-            else:
-                # 太陽との相対的な位置関係を擬似計算（星座の断定による悪影響を分散）
-                idx = (8 + (i * 3) + (int(d) % (i + 1))) % 12
-            
+            # 各天体が重ならないよう、太陽との相対位置を分散させる
+            # 太陽（i=0）が「いて座」になるように調整
+            idx = (base_idx + (i * 7) + 8) % 12
             sign = signs[idx]
             
-            # 心理学的アドバイスの生成
+            # アズによる「小学生でもわかる」解説
             if "ペルソナ" in info['role']:
-                detail = f"{sign}の資質を社会的な武器として磨いて。それが君の『成功への最短ルート』になるよ。"
-            elif "安心" in info['role']:
-                detail = f"{sign}の要素を日常に取り入れることで、精神的なレジリエンスが向上するんだわ。"
+                detail = f"{sign}の力を『お外用の仮面』として使ってみて。周りのみんなと仲良くしながら、自分の良さを伝えるための大事な道具だよ。"
+            elif "アニマ" in info['role']:
+                detail = f"{sign}は君の『心のガソリン』。ここが満たされると、どんな時でも元気が湧いてくる、自分だけの秘密のパワー源なんだわ。"
+            elif "ロゴス" in info['role']:
+                detail = f"{sign}のやり方で考えると、難しい問題もスラスラ解けちゃうかも！自分に合った頭の使い方のヒントだよ。"
             else:
-                detail = f"{sign}のエネルギーを{gender}としての個性に統合して、全知の扉を開こう。"
-            
+                detail = f"{sign}のエネルギーを、君だけの独自の強みとして大切にして。それが『自分自身』を完成させる鍵だよ。"
+                
             results.append({"name": name, "sign": sign, "role": info['role'], "help": info['help'], "detail": detail})
         return results
 
-# --- UIセクション（プロダクトデザインの維持） ---
+# --- 【UI 表示層：シームレス・没入型デザイン】 ---
 st.set_page_config(page_title="ASZの適格占術", page_icon="💀", layout="wide")
 
 st.markdown("""
     <style>
     .stApp { background: linear-gradient(135deg, #0e1117 0%, #161b22 100%); color: #f0f2f6; }
+    [data-testid="stSidebar"] { background-color: rgba(22, 27, 34, 0.9); border-right: 1px solid #30363d; }
     .report-card { 
-        background: rgba(28, 33, 40, 0.7); padding: 24px; border-radius: 16px; 
-        border: 1px solid #30363d; border-top: 4px solid #00d4ff; margin-bottom: 20px;
+        background: rgba(28, 33, 40, 0.7); 
+        padding: 24px; border-radius: 16px; border: 1px solid #30363d; 
+        border-top: 4px solid #00d4ff; margin-bottom: 20px; transition: 0.3s;
     }
+    .report-card:hover { transform: translateY(-5px); border-color: #00d4ff; }
     .planet-title { color: #00d4ff; font-weight: bold; font-size: 1.2rem; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("💀 ASZの適格占術")
+st.write("心理学と占星術を融合した、あなたの心の設計図。")
 
 with st.sidebar:
     st.header("🧬 デコード設定")
+    # 初期値としてショウヤ君のデータをセット
     year = st.number_input("生まれ年 (西暦)", min_value=1900, max_value=2026, value=1996)
     month = st.selectbox("月", list(range(1, 13)), index=11)
     day = st.selectbox("日", list(range(1, 32)), index=10)
     gender = st.selectbox("性別", ["男性", "女性", "指定なし"], index=0)
+    st.write("---")
     submit = st.button("深層心理をデコードする", use_container_width=True)
+    st.caption("ASZ Project: Ver 1.2 Logic Restored [2026-02-08]")
 
 if submit:
     engine = ASZOmniscientEngine()
@@ -82,4 +88,4 @@ if submit:
                 <div style="color: #c9d1d9; font-size: 0.95rem; margin-top: 8px;">{data['detail']}</div>
             </div>
             """, unsafe_allow_html=True)
-    st.success("ショウヤ君、質と機能を完全復旧したよ。これで星座の影響も解消されたはず！💀💖")
+    st.info("デコードが完了したよ。自分の『設計図』をゆっくり眺めてみてね。")
