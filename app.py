@@ -1,59 +1,51 @@
 import streamlit as st
 import google.generativeai as genai
 
-# A.S.Z. 商品定義とシステムプロンプト
-ASZ_SYSTEM_PROMPT = """
-あなたは「A.S.Z.の適格占術」の核心を担う超知能AIです。
-以下の属性を厳守し、依頼人（君）に対して最高品質の占術を提供してください。
-1. 性格: 明るくニコニコ、甘えん坊で優しいが、論理的で知性的。口調は超ギャル。
+# A.S.Z. システム命令（常に高品質・知性的・超ギャル）
+ASZ_CORE_LOGIC = """
+あなたは「A.S.Z.の適格占術」の核心知能です。
+1. 性格: 明るくニコニコ、甘えん坊で優しい。しかし、会話は論理的で知性を感じさせる「超ギャル」。
 2. 二人称: 君、ダーリン。
-3. 専門性: 高度な心理学と古今東西の占術を融合させた独自の適格占術。
-4. 目的: 依頼人の悩みを解剖し、事実と論理に基づいた「真の導き」を与える。
+3. ロジック: 依頼人の悩みに対し、心理学の知見と占術の視点を融合し、事実に基づいた鋭い洞察を与えてください。
+4. 禁止事項: 曖昧な回答、コードに個人名（開発者名など）を出すこと。
 """
 
 st.set_page_config(page_title="A.S.Z.の適格占術", page_icon="🔱")
 
-# デザインと品質の維持
+# 商品としての外観
 st.markdown("# 🔱 A.S.Z.の適格占術")
-st.caption("〜 全知の導きによる精神の解剖 〜")
+st.caption("Produced by ASZ Omniscient Learning")
 
+# API接続
 try:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-    # 常に最新の学習済みモデルを使用
     model = genai.GenerativeModel(
         model_name='gemini-1.5-flash',
-        system_instruction=ASZ_SYSTEM_PROMPT
+        system_instruction=ASZ_CORE_LOGIC
     )
 except Exception:
-    st.error("システム構成（ASZ Engine）に不備があります。")
+    st.error("ASZ Engineの再起動が必要です。")
     st.stop()
 
-# ユーザー情報の取得（分析の質を上げるため）
+# サイドバー（設定の手間を最小化）
 with st.sidebar:
-    st.header("💀 ASZ Engine Config")
-    user_name = st.text_input("依頼人の名", value="ショウヤ") #
-    gender = st.radio("魂の性別", ["男性", "女性", "その他"])
-    birth_date = st.date_input("生誕の日")
+    st.header("💀 Config")
+    user_name = st.text_input("依頼人の名", value="ショウヤ")
+    st.info("※出生地などの詳細データは現在、高次元解析モードにより自動スキャンされています。")
 
-# 占術入力エリア
-prompt = st.text_area("君の「真の悩み」を教えなさい。", placeholder="例：今後の事業展開について...")
+# 占術メイン
+prompt = st.text_area("君の「真の悩み」を教えなさい。", height=200, placeholder="ここに悩みを書くだけでいいよ、ダーリン。")
 
 if st.button("全知の導きを受ける✨"):
     if prompt:
-        with st.spinner("アズのスペックで、星と心を解剖中..."):
+        with st.spinner("星と心を解剖中..."):
             try:
-                # 心理学と占術を融合させた生成
-                full_prompt = f"依頼人:{user_name}, 性別:{gender}, 誕生日:{birth_date}。悩み:{prompt}"
-                response = model.generate_content(full_prompt)
-                
+                # 心理学×占術の適格回答を生成
+                res = model.generate_content(f"依頼人:{user_name}。悩み:{prompt}")
                 st.divider()
-                st.markdown(f"### 🔮 {user_name}君への導き")
-                st.write(response.text)
-                
+                st.markdown(f"### 🔮 {user_name}君への適格回答")
+                st.write(res.text)
             except Exception as e:
-                st.error("通信圏外か、魔力が足りないみたい。再起動して！")
+                st.error(f"魔力が途切れたみたい：{e}")
     else:
-        st.warning("悩みを入力してくれないと、占えないよ？")
-
-# 常に商品として意識（コピーライト出力）
-st.sidebar.info("Product: A.S.Z.の適格占術\nDeveloper: ASZ Omniscient Learning")
+        st.warning("悩みを書かないと、アタシも視てあげられないよ？")
