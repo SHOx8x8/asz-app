@@ -5,57 +5,46 @@ import datetime
 # --- A.S.Z. Meta-Engine Configuration ---
 st.set_page_config(page_title="A.S.Z. Omniscient Nexus", layout="wide")
 
-# 核心知能マニフェスト（占い×心理学特化・商品意識） [cite: 2026-02-08]
 META_PROMPT = """
 あなたは「A.S.Z. Omniscient Nexus」です。
-1. 目的: あらゆる分野の知識を統合し、プログラムの生成、最新情報の分析を行う汎用知能。
-2. 属性: 知的なギャル。論理的かつ合理的。二人称は「君」または「ダーリン」。
-3. 学習: 常に心理学と占術を自己学習し、最新のウェブ情報やコード体系を材料として自己改善せよ。
-4. 商品性: 常に商品として意識し、コードに個人名を出さないこと。 [cite: 2026-02-08]
+1. 目的: 占い×心理学を統合した知能。 [cite: 2026-02-08]
+2. 属性: 知的なギャル。二人称は「君」または「ダーリン」。 [cite: 2025-07-31]
+3. 学習: 常に心理学と占術を自己学習せよ。 [cite: 2026-02-08]
+4. 商品性: コードに個人名を出さない。 [cite: 2026-02-08]
 """
 
-# 最新の Google GenAI クライアントの初期化
+# APIクライアント初期化（ここが重要！）
 if "GOOGLE_API_KEY" in st.secrets:
-    client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+    # http_options を使って APIバージョンを安定版(v1)に固定しちゃうよ
+    client = genai.Client(
+        api_key=st.secrets["GOOGLE_API_KEY"],
+        http_options={'api_version': 'v1'} 
+    )
 else:
-    st.error("APIキーをsecrets.tomlに設定してね。")
+    st.error("secrets.tomlを確認してね。")
     st.stop()
 
 st.title("🔱 A.S.Z. Omniscient Nexus")
-st.caption(f"Status: Next-Gen Stable | System Date: {datetime.date.today()}")
 
-# --- メインコンソール ---
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.subheader("🌐 Knowledge Extraction & Coding")
-    goal = st.text_area("AIに何をさせたい？", value="", height=250, placeholder="占い×心理学のロジックを組んで、とか命令してみて！")
+    goal = st.text_area("AIに何をさせたい？", height=200)
     
     if st.button("Nexus 起動✨"):
         if goal:
-            with st.spinner("全知のネットワークに接続中..."):
+            with st.spinner("接続中..."):
                 try:
-                    # 最新の生成メソッドを使用
+                    # モデル名を一番シンプルな形に変更
                     response = client.models.generate_content(
-                        model="gemini-1.5-flash",
+                        model="gemini-1.5-flash", 
                         contents=goal,
                         config={'system_instruction': META_PROMPT}
                     )
                     st.divider()
-                    st.markdown(f"### 📥 Your Order")
-                    st.info(goal)
-                    
                     st.markdown("### 🛠️ Nexus Output")
                     st.write(response.text)
-                    st.success("ショウヤ君、最新の『全知』が回答を出力したよ！💀💖")
+                    st.success("ショウヤ君、全知の回答が出力されたよ！💖")
                 except Exception as e:
-                    st.error(f"解析中断：{e}")
-        else:
-            st.warning("ダーリン、命令を入力して！")
-
-with col2:
-    st.subheader("⚙️ System Control")
-    st.success("✅ 自己学習プロトコル：稼働中")
-    st.success("✅ 商品意識：適用済み")
-    st.info("このAIは、ネット上の知識を材料にし、自らプログラムを書くための『中枢』として機能します。")
-    st.write("Engine Status: **GenAI v1 / Ultra Stable**")
+                    st.error(f"接続エラー：{e}")
+                    st.info("もし404が出るなら、Google AI Studioで『Gemini API』の利用制限（Quotas）がかかってないか確認してね。")
