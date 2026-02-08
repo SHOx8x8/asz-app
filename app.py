@@ -1,7 +1,7 @@
 import streamlit as st
 import datetime
 
-# --- 【ASZ 占術×心理学 統合エンジン】 ---
+# --- 【ASZの適格占術】 ---
 class ASZOmniscientEngine:
     def __init__(self):
         # 数秘（占術）× アドラー心理学（目的論）
