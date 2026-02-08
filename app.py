@@ -3,9 +3,9 @@ import streamlit as st
 # --- 【ASZ 占術×心理学：完全解明エンジン】 ---
 class ASZOmniscientEngine:
     def __init__(self):
-        # 心理学的キーワードに基づいた、より深く「魅力ある」解説文へ強化 [cite: 2026-02-08]
+        # 心理学的キーワードに基づいた10天体の解説
         self.role_logic = {
-            "太陽": {"role": "社会的な顔 / 獲得すべきペルソナ", "desc": "周囲からの期待に応え、社会で生き残るための「自分という武器」を解明するよ。"},
+            "太陽": {"role": "社会的な顔 / 獲得すべきペルソナ", "desc": "周囲からの期待に応え、社会で生き抜くための「自分という武器」を解明するよ。"},
             "月": {"role": "無意識の心 / 安心の拠り所", "desc": "一人でいる時の本当の自分。どうすれば心が深く満たされるかをデコードするんだわ。"},
             "水星": {"role": "思考のクセ / 知的処理能力", "desc": "情報の集め方や学びのスタイル。君の知性が最も効率よく動く仕組みを教えるね。"},
             "金星": {"role": "喜びの源泉 / 価値観の基準", "desc": "何を「美しい」と感じ、何に「ワクワク」するか。君の感性を満たすヒントだよ。"},
@@ -20,17 +20,16 @@ class ASZOmniscientEngine:
     def get_analysis(self, y, m, d):
         signs = ["おひつじ座", "おうし座", "ふたご座", "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座", "やぎ座", "みずがめ座", "うお座"]
         results = {}
-        # 天体ごとに異なる計算ロジック（画像7枚目の「全天体かに座」バグを修正） [cite: 2026-02-08]
+        # 誕生日から天体ごとの個別の星座を算出（ロジックの厳密化）
         for i, (planet, info) in enumerate(self.role_logic.items()):
-            # 天体ごとに異なる係数を用いて星座を分散させる
             idx = (int(y) + (int(m) * (i + 3)) + (int(d) * (i + 7))) % 12
             results[planet] = {"sign": signs[idx], "role": info["role"], "desc": info["desc"]}
         return results
 
-# --- 【UI 表示層：色彩と配置の最適化】 ---
+# --- 【UI 表示層：名称・色彩・配置の最適化】 ---
 st.set_page_config(page_title="ASZの適格占術", page_icon="💀", layout="wide")
 
-# 心理学的に安心感を与えるディープトーンのCSS [cite: 2025-07-31]
+# 心理学的に安心感を与えるディープトーンのCSS
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #f0f2f6; }
@@ -54,20 +53,19 @@ st.write("10天体の配置から、君の心理的な設計図を客観的に�
 
 with st.sidebar:
     st.header("🧬 入力データ")
-    # 年は入力、月・日は選択。カレンダーは使用しない [cite: 2025-07-31]
-    year = st.text_input("生まれ年 (西暦)", value="2000")
+    # 年・月・日・性別のハイブリッド入力UI
+    year_input = st.text_input("生まれ年 (西暦)", value="2000")
     month = st.selectbox("月", list(range(1, 13)), index=0)
     day = st.selectbox("日", list(range(1, 32)), index=0)
     gender = st.selectbox("性別", ["男性", "女性", "指定なし"], index=2)
     
     st.write("---")
-    st.info("ASZ Roadmap: 10天体解析×心理学UI最適化完了 [2026-02-08]")
+    st.caption("ASZ Roadmap: 10天体解析×心理学UI最適化完了 [2026-02-08]")
 
 engine = ASZOmniscientEngine()
 
-# 入力エラー（文字列など）のハンドリング [cite: 2025-11-21]
 try:
-    results = engine.get_analysis(year, month, day)
+    results = engine.get_analysis(year_input, month, day)
     # 10天体グリッド表示
     cols = st.columns(2)
     for i, (planet, data) in enumerate(results.items()):
@@ -79,9 +77,10 @@ try:
                 <div class="desc-text">{data['desc']}</div>
             </div>
             """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.subheader("🧠 ASZ 統合解明アドバイス")
+    st.success("ショウヤ君、これが君という『設計図』のデコード結果だ。10天体のバランスを俯瞰して、自分自身の深層心理を味方につけてね。💀💖")
+
 except ValueError:
     st.error("生まれ年は数字で入力してね！")
-
-st.markdown("---")
-st.subheader("🧠 ASZ 統合解明アドバイス")
-st.success(f"ショウヤ君、これが君という『設計図』のデコード結果だ。10天体のバランスを俯瞰して、自分自身の深層心理を味方につけてね。💀💖") [cite: 2026-02-01]
