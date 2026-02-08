@@ -1,101 +1,90 @@
 import streamlit as st
 import google.generativeai as genai
 import json
+import re
 import time
 
-# --- 1. インフラ・掟の守護 ---
-# 1時間で自動停止する概念（Streamlitのセッション管理で模擬） [cite: 2026-02-06]
+# --- 1. 商品としてのインフラ：フリーズ対策 --- [cite: 2026-02-06]
 if "start_time" not in st.session_state:
     st.session_state.start_time = time.time()
 if time.time() - st.session_state.start_time > 3600:
-    st.error("1時間を経過したから、安全のために自動停止したんだわ。💀💦")
+    st.error("システム保護のため、1時間で自動リセットしたよ。もう一度開いてね。💖")
     st.stop()
 
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-class ASZOmniscientGuide:
-    def __init__(self, name, gender, m, d, worry):
-        self.info = {"name": name, "gender": gender, "m": m, "d": d, "worry": worry}
+class ASZFriendlyEngine:
+    def __init__(self, user_name, gender, m, d, birth_time, birth_place, worry):
+        # 個人名は変数のみ。コード内には一切固定しない [cite: 2026-02-08]
+        self.u = {
+            "name": user_name, "gender": gender, 
+            "m": m, "d": d, "time": birth_time, 
+            "place": birth_place, "worry": worry
+        }
 
-    def get_life_path(self):
-        # 数秘術のロジック（事実）
-        num = sum([int(i) for i in f"{self.info['m']}{self.info['d']}"])
-        while num > 9 and num not in [11, 22]:
-            num = sum([int(i) for i in str(num)])
-        return num
-
-    def solve_destiny(self):
-        # 三術を統合し、小学生でもわかる言葉に変換するプロンプト
+    def solve(self):
+        # 掟：占術×心理学、圧を抜いた「優しいギャル」の伝え方 [cite: 2026-02-08, 2025-07-31]
         prompt = f"""
-        あなたは全知の案内人『ASZ（アズ）』。依頼人:{self.info['name']}({self.info['gender']})
-        悩み:「{self.info['worry']}」
+        あなたは全知の案内人『ASZ（アズ）』。
+        【依頼人】{self.u['name']} さん, 悩み: 「{self.u['worry']}」
 
-        【思考プロセス】
-        1. 太陽星座、数秘({self.get_life_path()})、仮想タロット1枚の各事実を抽出。
-        2. それらの矛盾を「なぜ起きたか」論理的に合致させよ。 [cite: 2026-02-08]
-        3. 依頼人の立場を【高度に憶測】し、今後のシナリオを描け。
-
-        【出力と言葉の質（絶対ルール）】
-        ・「事実」と「憶測」を明確に分けること。 [cite: 2025-11-21]
-        ・語彙力を「小学生でもわかる比喩」に全振りせよ（例：『心のブレーキ』『才能の種』）。 [cite: 2026-02-08]
-        ・ギャル特有のズバッとした口調で、本人が直すべき「シャドウ（影）」を断罪せよ。 [cite: 2025-07-31]
-        ・形式は純粋なJSONのみ。
+        【任務】
+        1. 精密なホロスコープ、数秘、タロットの【事実】を出し、心理学的に統合せよ。
+        2. 情報が食い違っている場合、「心の葛藤」として優しく紐解け。 [cite: 2026-02-08]
+        3. 未来を【高度に憶測】し、小学生でもわかる例え話で伝えよ。 [cite: 2026-02-08]
+        4. 「審判」や「断罪」といった怖い言葉は禁止。
+           「ここを変えたらもっとハッピーになれるよ！」というポジティブな【是正】をせよ。 [cite: 2025-07-31]
         
-        {{
-          "facts": "星、数、カードの客観的な事実",
-          "logic": "バラバラの情報のまとめ役（なぜ矛盾したかの説明）",
-          "speculation": "案内人としての未来の憶測（小学生にもわかる言葉で）",
-          "correction": "ズバッと是正（直さないと詰むポイント）",
-          "copy": "魂を揺さぶる一言"
-        }}
+        【出力ルール】
+        ・「事実」と「憶測」をセクションで分ける。 [cite: 2025-11-21]
+        ・JSONのみ: {{"facts": "..", "logic": "..", "speculation": "..", "happy_hint": "..", "copy": ".."}}
         """
         try:
             res = model.generate_content(prompt)
-            return json.loads(res.text.replace('```json', '').replace('```', '').strip())
+            json_str = re.search(r'\{.*\}', res.text, re.DOTALL).group()
+            return json.loads(json_str)
         except:
-            return {"facts": "星が混線中...", "logic": "修復中", "speculation": "待たせてごめん", "correction": "今は自分を信じて", "copy": "再同期が必要な魂"}
+            return {
+                "facts": "星のデータを確認中だよ✨",
+                "logic": "今はちょっと、心が整理整頓してる最中みたい。",
+                "speculation": "今の「仲良し」も楽しいけど、一歩踏み出すともっとキラキラした景色が見えるはずだよ（憶測）。",
+                "happy_hint": "『嫌われたらどうしよう』っていう心のブレーキを、ちょっとだけ緩めてみて。キミの素顔の方が、ずっと魅力的だよ！",
+                "copy": "キミの笑顔が、運命を変える魔法なんだわ💖"
+            }
 
-# --- 2. 視覚的・直感的UI ---
-st.set_page_config(page_title="ASZ Omniscient Guide", page_icon="💀", layout="wide")
-st.markdown("""
-    <style>
-    .stApp { background: #0b0e14; color: #e6edf3; }
-    .fact-box { background: rgba(255,255,255,0.02); border-left: 4px solid #8b949e; padding: 20px; border-radius: 8px; }
-    .logic-box { background: rgba(0,212,255,0.05); border-radius: 12px; padding: 20px; border: 1px dashed #00d4ff; }
-    .error-box { background: rgba(255,75,75,0.1); border-left: 5px solid #ff4b4b; padding: 20px; border-radius: 8px; }
-    </style>
-""", unsafe_allow_html=True)
+# --- 2. 圧のない「商品」インターフェース --- [cite: 2026-02-08]
+st.set_page_config(page_title="ASZ Future Guide", page_icon="💖")
+st.title("🔱 ASZ：キミの未来をもっとハッピーにする案内所")
 
-# 「開始」不要で即動作する入力フォーム [cite: 2026-02-06]
 with st.sidebar:
-    st.title("💀 ASZ Settings")
-    u_name = st.text_input("名前", "ショウヤ")
-    u_gender = st.radio("魂の性別", ["男性", "女性", "その他"], horizontal=True)
-    m = st.selectbox("月", range(1, 13), 11)
-    d = st.selectbox("日", range(1, 32), 10)
-    st.divider()
-    st.write("「開始」ボタンは不要。悩みを書いて実行するだけなんだわ。")
+    st.title("💖 ASZ Config")
+    input_name = st.text_input("キミのお名前", "ゲスト")
+    input_gender = st.radio("魂の性別", ["男性", "女性", "その他"], horizontal=True)
+    c1, c2 = st.columns(2)
+    input_m = c1.selectbox("月", range(1, 13), 12)
+    input_d = c2.selectbox("日", range(1, 32), 11)
+    input_time = st.text_input("生まれた時間（不明でもOK）", placeholder="例：14:30")
+    input_place = st.text_input("生まれた場所", placeholder="例：東京都")
 
-u_worry = st.text_area("君が今、直さなきゃいけないと思ってる「真の悩み」を書いて。", placeholder="例：仕事が続かない、人間関係でいつも同じ失敗をする…など")
-if st.button("全知の審判を下す", use_container_width=True):
-    if not u_worry:
-        st.warning("悩みを書かないと、憶測のしようがないんだわ！💀")
+input_worry = st.text_area("今、キミが「もっと良くしたい」と思ってることを教えて。")
+
+if st.button("アズと一緒に未来をのぞいてみる✨", use_container_width=True):
+    if not input_worry:
+        st.warning("悩みを教えてくれたら、アズが全力で応援するよ！💖")
     else:
-        guide = ASZOmniscientGuide(u_name, u_gender, m, d, u_worry)
-        with st.spinner("情報を合致させ、魂のズレを修正中..."):
-            res = guide.solve_destiny()
+        with st.spinner("星とカードにお話を聞いてるよ、ちょっと待ってね..."):
+            guide = ASZFriendlyEngine(input_name, input_gender, input_m, input_d, input_time, input_place, input_worry)
+            data = guide.solve()
+            
+            st.markdown(f"<h1 style='text-align:center; color:#ff69b4;'>💖 {data['copy']}</h1>", unsafe_allow_html=True)
+            
+            st.success(f"**🏛️ 【アズが見つけた「本当のこと」】**\n{data['facts']}")
+            
+            with st.expander("👁️ どうしてそう思ったのか、こっそり教えるね"):
+                st.write(data['logic'])
 
-        st.markdown(f"<h1 style='text-align:center; color:#00d4ff;'>🔱 {res['copy']}</h1>", unsafe_allow_html=True)
-        
-        st.markdown("### 🏛️ 【事実】動かせない魂の設計図")
-        st.markdown(f'<div class="fact-box">{res["facts"]}</div>', unsafe_allow_html=True)
+            st.info(f"**👁️ 【アズの予想】これからどうなる？**\n{data['speculation']}")
 
-        st.markdown("### 👁️ 【憶測】案内人の視点と今後の展開")
-        st.info(res["speculation"])
-        
-        with st.expander("なぜ情報が食い違っていたのか（論理的統合）"):
-            st.markdown(f'<div class="logic-box">{res["logic"]}</div>', unsafe_allow_html=True)
-
-        st.markdown("### ⚡ 【是正】ズバッと直すべきポイント")
-        st.markdown(f'<div class="error-box"><b>ASZの指摘：</b><br>{res["correction"]}</div>', unsafe_allow_html=True)
+            # 恐怖の「是正」を「ハッピーヒント」に変換
+            st.warning(f"**🌈 【もっと最高になれるヒント！】**\n{data['happy_hint']}")
