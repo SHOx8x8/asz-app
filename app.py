@@ -1,77 +1,81 @@
 import streamlit as st
 import datetime
 
-# --- 【ASZの適格占術】 ---
+# --- 【ASZ 占術×心理学：全天体解明エンジン】 ---
 class ASZOmniscientEngine:
     def __init__(self):
-        # 数秘（占術）× アドラー心理学（目的論）
-        self.num_logic = {
-            1: {"name": "きりひらく人", "desc": "心理学で見ると『自分で決めること』で一番パワーが出るタイプ。"},
-            2: {"name": "つなぐ人", "desc": "心理学で見ると『だれかの役に立っている』と感じるのが得意なタイプ。"},
-            3: {"name": "生み出す人", "desc": "心理学で見ると『自由なアイデア』を出すことで心が安定するタイプ。"},
-            4: {"name": "ささえる人", "desc": "心理学で見ると『いつものリズム』を守ることで、自信がつくタイプ。"},
-            5: {"name": "動く人", "desc": "心理学で見ると『新しい刺激』があるほど、脳が元気になるタイプ。"},
-            6: {"name": "守る人", "desc": "心理学で見ると『身近な人の笑顔』が、一番のエネルギーになるタイプ。"},
-            7: {"name": "考える人", "desc": "心理学で見ると『ひとりの時間』に深く考えることで、天才的な答えが出るタイプ。"},
-            8: {"name": "かなえる人", "desc": "心理学で見ると『目標をクリア』していくことで、どんどん強くなるタイプ。"},
-            9: {"name": "包み込む人", "desc": "心理学で見ると『みんなの幸せ』を考えることで、自分の価値を感じるタイプ。"},
-            11: {"name": "ひらめく人", "desc": "心理学で見ると『直感』を信じることで、道が開ける特別なタイプ。"},
-            22: {"name": "形にする人", "desc": "心理学で見ると『大きな夢』を現実に変える力が備わっているタイプ。"}
+        # 心理学的な「天体の役割」の定義
+        self.role_logic = {
+            "太陽": "【外側の自分】社会で活動する時のエネルギー（ペルソナ）",
+            "月": "【内側の自分】プライベートで安心を感じる心の土台（無意識）",
+            "水星": "【思考のクセ】情報の集め方や、おしゃべりのスタイル（知性）",
+            "金星": "【喜びの源】何にワクワクし、何を美しいと感じるか（感性）",
+            "火星": "【やる気スイッチ】目標に向かって突き進む時のパワー（行動力）",
+            "木星": "【成長の鍵】幸運を広げ、自分を肯定するためのヒント（拡大）",
+            "土星": "【課題と努力】心理学的に向き合うべき、自分を強くする壁（試練）",
+            "天王星": "【変化の力】自分の中の個性を爆発させるポイント（変革）",
+            "海王星": "【夢と理想】インスピレーションや、目に見えない理想（境界）",
+            "冥王星": "【再生のパワー】どん底から這い上がる、究極の集中力（変容）"
         }
 
-    # 誕生数計算（ロジカルな統計データ）
-    def calc_num(self, y, m, d):
-        digits = str(y) + str(m) + str(d)
-        total = sum(int(char) for char in digits)
-        while total > 9 and total not in [11, 22]:
-            total = sum(int(char) for char in str(total))
-        return total
-
-    # 星のデータ（占術）× ユング心理学（タイプ論）
-    def get_astro_analysis(self, y, m, d):
+    def get_full_analysis(self, y, m, d):
         signs = ["おひつじ座", "おうし座", "ふたご座", "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座", "やぎ座", "みずがめ座", "うお座"]
-        
-        # 太陽：ユングの「ペルソナ（外向けの自分）」
-        sun_idx = (y + m + d) % 12
-        # 月：ユングの「無意識（ほんとうの自分）」
-        moon_idx = (y * m + d) % 12
-        
-        return {
-            "ペルソナ": signs[sun_idx],
-            "無意識": signs[moon_idx]
-        }
+        analysis = {}
+        for i, (planet, role) in enumerate(self.role_logic.items()):
+            # 統計的な配置データ（占術）を計算
+            idx = (y + m * (i + 1) + d) % 12
+            analysis[planet] = {"sign": signs[idx], "role": role}
+        return analysis
 
-# --- 【UI 表示層】 ---
-st.set_page_config(page_title="ASZ Analytics", page_icon="💀")
+# --- 【UI 表示層：ダーク・リッチ・デザイン】 ---
+st.set_page_config(page_title="ASZ Omniscient Engine", page_icon="💀", layout="wide")
 
-st.title("💀 ASZ：占術 × 心理学 統合エンジン")
-st.write("「占術」のデータと「心理学」のロジックで、君を多角的に解明するよ。")
+st.markdown("""
+    <style>
+    .report-card { 
+        background: #1a1c24; 
+        padding: 20px; 
+        border-radius: 15px; 
+        border: 1px solid #444; 
+        margin-bottom: 20px; 
+        min-height: 150px;
+    }
+    .planet-name { color: #00d4ff; font-weight: bold; font-size: 1.2rem; }
+    .role-text { color: #888; font-size: 0.85rem; margin-bottom: 10px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("💀 ASZ：全天体 × 心理学 統合解明エンジン")
+st.write("10天体の配置データ（占術）を、心理学のロジックでデコードするよ。")
 
 with st.sidebar:
     st.header("🧬 診断データの入力")
     dob = st.date_input("誕生日を選んでね", datetime.date(2000, 1, 1))
-    st.info("ASZ Roadmap: 占術と心理学の自己学習を継続中 [2026-02-08]")
+    st.write("---")
+    st.info("ASZ Roadmap: 10天体解析×心理学の統合を完了 [2026-02-08]")
 
 engine = ASZOmniscientEngine()
-num = engine.calc_num(dob.year, dob.month, dob.day)
-astro = engine.get_astro_analysis(dob.year, dob.month, dob.day)
+results = engine.get_full_analysis(dob.year, dob.month, dob.day)
 
-# 結果のカード表示
-st.subheader(f"🔢 タイプ番号：{num}（{engine.num_logic[num]['name']}）")
-st.info(engine.num_logic[num]['desc'])
-
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown(f"### 🌞 外で見せている自分\n**{astro['ペルソナ']}**")
-    st.write("心理学では『ペルソナ』と呼びます。社会の中で、君がどう振る舞うのが得意かを示しているよ。")
-
-with col2:
-    st.markdown(f"### 🌙 ほんとうの自分\n**{astro['無意識']}**")
-    st.write("心理学では『無意識』や『本能』と呼びます。ひとりでおうちにいる時の、リラックスした君だね。")
+# 10天体をグリッドで表示（リッチな10天体解説の復活）
+cols = st.columns(2)
+for i, (planet, data) in enumerate(results.items()):
+    with cols[i % 2]:
+        st.markdown(f"""
+        <div class="report-card">
+            <div class="role-text">{data['role']}</div>
+            <div class="planet-name">{planet} × {data['sign']}</div>
+            <p style="margin-top:10px;">
+                心理学で見ると、君の<b>{planet}</b>の力は<b>{data['sign']}</b>の形で表現されるよ。
+                これが君の個性を作り出す大事なピースなんだ。
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.subheader("🧠 ASZ 統合アドバイス")
+st.subheader("🧠 ASZ 統合解明アドバイス")
 st.success(f"""
-君の番号「{num}」の才能を活かしながら、外向けの自分（{astro['ペルソナ']}）と、
-本当の自分（{astro['無意識']}）のバランスをうまくとることが、君という人間を攻略する鍵だよ。💀💖
+10天体のデータが示すのは、君という複雑な人間の「設計図」だよ。💀💖
+特に<b>太陽（{results['太陽']['sign']}）</b>で見せる社会的な顔と、<b>月（{results['月']['sign']}）</b>の無意識のバランスを意識してみて。
+心理学的に「自分を知ること」こそが、全知への最短ルートだよ。🚀✨
 """)
