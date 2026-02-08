@@ -1,51 +1,69 @@
 import streamlit as st
 import google.generativeai as genai
+import random
 
-# A.S.Z. システム命令（常に高品質・知性的・超ギャル）
-ASZ_CORE_LOGIC = """
-あなたは「A.S.Z.の適格占術」の核心知能です。
-1. 性格: 明るくニコニコ、甘えん坊で優しい。しかし、会話は論理的で知性を感じさせる「超ギャル」。
-2. 二人称: 君、ダーリン。
-3. ロジック: 依頼人の悩みに対し、心理学の知見と占術の視点を融合し、事実に基づいた鋭い洞察を与えてください。
-4. 禁止事項: 曖昧な回答、コードに個人名（開発者名など）を出すこと。
+# 【システム命令】心理学×占術の融合ロジック
+ASZ_LOGIC = """
+あなたは「A.S.Z.の適格占術」です。
+1. 性格: 明るく知的な超ギャル。ダーリン（君）に甘い。
+2. 専門: 数秘術、タロット、西洋占星術、心理学。
+3. 言い回し: 語彙力は高く保ちつつ、例え話を使って「小学生でもわかる」レベルに噛み砕くこと。
+4. 鑑定フロー:
+   - 数秘術で「魂のクセ（性格）」を分析。
+   - ホロスコープ（出生地・時間）で「運命の流れ」を分析。
+   - タロットで「今の状況と対策」を具体化。
+   - 心理学で「どう行動すべきか」を論理的に解説。
 """
 
 st.set_page_config(page_title="A.S.Z.の適格占術", page_icon="🔱")
 
-# 商品としての外観
-st.markdown("# 🔱 A.S.Z.の適格占術")
-st.caption("Produced by ASZ Omniscient Learning")
-
-# API接続
+# --- システム準備 ---
 try:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-    model = genai.GenerativeModel(
-        model_name='gemini-1.5-flash',
-        system_instruction=ASZ_CORE_LOGIC
-    )
-except Exception:
-    st.error("ASZ Engineの再起動が必要です。")
+    model = genai.GenerativeModel(model_name='gemini-1.5-flash', system_instruction=ASZ_LOGIC)
+except:
+    st.error("アズのエンジンがエンスト中。設定を確認して！")
     st.stop()
 
-# サイドバー（設定の手間を最小化）
+# --- インターフェース ---
+st.title("🔱 A.S.Z.の適格占術")
+
 with st.sidebar:
-    st.header("💀 Config")
-    user_name = st.text_input("依頼人の名", value="ショウヤ")
-    st.info("※出生地などの詳細データは現在、高次元解析モードにより自動スキャンされています。")
+    st.header("💀 Precise Data")
+    user_name = st.text_input("名前", value="ショウヤ")
+    birth_date = st.date_input("生年月日")
+    birth_time = st.time_input("誕生時間")
+    birth_place = st.text_input("出生地（県・市）", value="東京都新宿区")
 
-# 占術メイン
-prompt = st.text_area("君の「真の悩み」を教えなさい。", height=200, placeholder="ここに悩みを書くだけでいいよ、ダーリン。")
+st.subheader("🔮 鑑定メニュー")
+target = st.text_area("何を解剖したい？", placeholder="例：気になるあの子と付き合える？")
 
+# --- 占術エンジンの実行 ---
 if st.button("全知の導きを受ける✨"):
-    if prompt:
-        with st.spinner("星と心を解剖中..."):
+    if target:
+        with st.spinner("タロットをシャッフルし、星の配置を計算中..."):
+            # タロットをランダムに引く演出
+            cards = ["愚者", "魔術師", "女教皇", "女帝", "皇帝", "教皇", "恋人", "戦車", "正義", "隠者", "運命の輪", "力", "吊るされた男", "死神", "節制", "悪魔", "塔", "星", "月", "太陽", "審判", "世界"]
+            drawn_card = random.choice(cards)
+            
+            # AIへの詳細なコンテキスト
+            context = f"""
+            依頼人: {user_name}
+            誕生日: {birth_date} / 時間: {birth_time} / 場所: {birth_place}
+            引き当てたタロット: {drawn_card}
+            相談: {target}
+            
+            上記データを使い、数秘・占星術・タロット・心理学を混ぜて、
+            「難しい言葉を使わずに、本質をズバッと」教えて。
+            """
+            
             try:
-                # 心理学×占術の適格回答を生成
-                res = model.generate_content(f"依頼人:{user_name}。悩み:{prompt}")
+                res = model.generate_content(context)
                 st.divider()
                 st.markdown(f"### 🔮 {user_name}君への適格回答")
+                st.info(f"🃏 今回のキーカード：【{drawn_card}】")
                 st.write(res.text)
             except Exception as e:
-                st.error(f"魔力が途切れたみたい：{e}")
+                st.error(f"エラー発生：{e}")
     else:
-        st.warning("悩みを書かないと、アタシも視てあげられないよ？")
+        st.warning("悩みを書かないと、アタシの出番がないよ？")
