@@ -23,9 +23,9 @@ if st.button("Nexus 起動✨"):
     if goal:
         with st.spinner("Nexus 接続中..."):
             try:
-                # 404対策：モデル名をシンプルに指定
+                # エラー回避：モデル名を 'models/' 付きの正式名称に変更
                 response = client.models.generate_content(
-                    model="gemini-1.5-flash", 
+                    model="models/gemini-1.5-flash", 
                     contents=goal
                 )
                 st.success("繋がった！！ついに Nexus が目覚めたよ、ダーリン！💖")
